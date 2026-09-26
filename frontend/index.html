@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIAGR &mdash; Enterprise Information Asset Governance Register</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-logo">EIAGR</div>
+      <div class="login-sub">Enterprise Information Asset Governance Register</div>
+      <div class="login-org">Northern Rivers Local Health District</div>
+    </div>
+    <form id="login-form">
+      <label>Username</label>
+      <input type="text" id="login-username" autocomplete="username" required>
+      <label>Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" required>
+      <button type="submit">Sign In</button>
+      <div id="login-error" class="error-text"></div>
+    </form>
+    <div class="login-demo">
+      <div class="login-demo-title">Demo accounts (password: <code>password123</code>)</div>
+      <table>
+        <tr><td><code>sysadmin</code></td><td>System Administrator</td></tr>
+        <tr><td><code>govadmin</code></td><td>Information Governance Administrator</td></tr>
+        <tr><td><code>assetowner</code></td><td>Information Asset Owner</td></tr>
+        <tr><td><code>privacy</code></td><td>Privacy/Cyber Security Reviewer</td></tr>
+        <tr><td><code>auditor</code></td><td>Auditor</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div id="app" class="app hidden">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand">EIAGR</span>
+      <span class="brand-sub">Northern Rivers Local Health District</span>
+    </div>
+    <nav class="topnav" id="topnav">
+      <button data-view="dashboard" class="nav-btn active">Dashboard</button>
+      <button data-view="assets" class="nav-btn">Asset Register</button>
+      <button data-view="audit" class="nav-btn" id="nav-audit">Audit Log</button>
+      <button data-view="admin" class="nav-btn" id="nav-admin">Administration</button>
+    </nav>
+    <div class="topbar-right">
+      <span id="user-badge" class="user-badge"></span>
+      <button id="logout-btn" class="btn-ghost">Log out</button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- ---------- DASHBOARD VIEW ---------- -->
+    <section id="view-dashboard" class="view">
+      <h1>Governance Dashboard</h1>
+      <div class="kpi-row" id="kpi-row"></div>
+      <div class="dash-grid">
+        <div class="card">
+          <h3>Assets by Classification</h3>
+          <div id="chart-classification" class="bar-chart"></div>
+        </div>
+        <div class="card">
+          <h3>Assets by Criticality</h3>
+          <div id="chart-criticality" class="bar-chart"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Governance Exceptions</h3>
+        <div id="exceptions-list" class="exceptions-list"></div>
+      </div>
+    </section>
+
+    <!-- ---------- ASSET REGISTER VIEW ---------- -->
+    <section id="view-assets" class="view hidden">
+      <h1>Asset Register</h1>
+      <div class="toolbar">
+        <input type="text" id="search-box" placeholder="Search by name, code, or description&hellip;">
+        <select id="filter-classification"><option value="">All classifications</option></select>
+        <select id="filter-criticality">
+          <option value="">All criticality</option>
+          <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+        </select>
+        <select id="filter-lifecycle"><option value="">All lifecycle states</option></select>
+        <select id="filter-review"><option value="">All review statuses</option>
+          <option>Overdue</option><option>Due Soon</option><option>Due</option><option>Not Due</option>
+        </select>
+        <button id="btn-new-asset" class="btn-primary">+ New Asset</button>
+        <button id="btn-export" class="btn-ghost">Export CSV</button>
+        <label class="btn-ghost file-btn">Import CSV<input type="file" id="import-file" accept=".csv" hidden></label>
+      </div>
+      <div id="import-result" class="import-result hidden"></div>
+      <table class="asset-table">
+        <thead>
+          <tr>
+            <th>Asset ID</th><th>Name</th><th>Org Unit</th><th>Owner</th>
+            <th>Classification</th><th>Criticality</th><th>Lifecycle</th><th>Review</th>
+          </tr>
+        </thead>
+        <tbody id="asset-table-body"></tbody>
+      </table>
+      <div id="asset-count" class="asset-count"></div>
+    </section>
+
+    <!-- ---------- ASSET DETAIL VIEW ---------- -->
+    <section id="view-detail" class="view hidden">
+      <button id="btn-back-to-list" class="btn-ghost">&larr; Back to Asset Register</button>
+      <h1 id="detail-title">Asset</h1>
+      <div class="detail-grid">
+        <div class="card">
+          <h3>Ownership &amp; Classification</h3>
+          <div id="detail-form"></div>
+          <button id="btn-save-asset" class="btn-primary">Save Changes</button>
+          <span id="save-status" class="save-status"></span>
+        </div>
+        <div class="card">
+          <h3>Criticality Assessment</h3>
+          <div id="criticality-form"></div>
+          <button id="btn-assess" class="btn-primary">Calculate &amp; Save Score</button>
+          <div id="criticality-result" class="criticality-result"></div>
+        </div>
+        <div class="card">
+          <h3>Lifecycle</h3>
+          <div id="lifecycle-current"></div>
+          <div id="lifecycle-actions"></div>
+        </div>
+        <div class="card">
+          <h3>Governance Review</h3>
+          <div id="review-form"></div>
+          <button id="btn-review" class="btn-primary">Complete Review</button>
+          <h4>Review History</h4>
+          <div id="review-history"></div>
+        </div>
+        <div class="card wide">
+          <h3>Audit History</h3>
+          <div id="detail-audit"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- AUDIT LOG VIEW ---------- -->
+    <section id="view-audit" class="view hidden">
+      <h1>Audit Log</h1>
+      <table class="asset-table">
+        <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Asset</th><th>Field</th><th>Old &rarr; New</th></tr></thead>
+        <tbody id="audit-table-body"></tbody>
+      </table>
+    </section>
+
+    <!-- ---------- ADMINISTRATION VIEW ---------- -->
+    <section id="view-admin" class="view hidden">
+      <h1>Administration</h1>
+      <div class="dash-grid">
+        <div class="card">
+          <h3>Add Asset Type</h3>
+          <input type="text" id="admin-assettype-name" placeholder="Asset type name">
+          <button class="btn-primary" id="btn-add-assettype">Add</button>
+        </div>
+        <div class="card">
+          <h3>Add Classification Level</h3>
+          <input type="text" id="admin-classification-name" placeholder="Classification level name">
+          <input type="number" id="admin-classification-rank" placeholder="Rank (1-4)">
+          <button class="btn-primary" id="btn-add-classification">Add</button>
+        </div>
+        <div class="card">
+          <h3>Add Retention Rule</h3>
+          <input type="text" id="admin-retention-name" placeholder="Rule name">
+          <input type="text" id="admin-retention-period" placeholder="Retention period">
+          <input type="text" id="admin-retention-authority" placeholder="Disposal authority">
+          <button class="btn-primary" id="btn-add-retention">Add</button>
+        </div>
+        <div class="card">
+          <h3>User Accounts</h3>
+          <input type="text" id="admin-user-username" placeholder="Username">
+          <input type="text" id="admin-user-fullname" placeholder="Full name">
+          <select id="admin-user-role"></select>
+          <input type="text" id="admin-user-password" placeholder="Password" value="password123">
+          <button class="btn-primary" id="btn-add-user">Add User</button>
+          <div id="admin-user-list"></div>
+        </div>
+      </div>
+      <div id="admin-status" class="save-status"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ---------- NEW ASSET MODAL ---------- -->
+<div id="modal-backdrop" class="modal-backdrop hidden">
+  <div class="modal">
+    <h2>Register New Information Asset</h2>
+    <div id="new-asset-form"></div>
+    <div class="modal-actions">
+      <button id="btn-cancel-new" class="btn-ghost">Cancel</button>
+      <button id="btn-create-asset" class="btn-primary">Register Asset</button>
+    </div>
+    <div id="new-asset-error" class="error-text"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
